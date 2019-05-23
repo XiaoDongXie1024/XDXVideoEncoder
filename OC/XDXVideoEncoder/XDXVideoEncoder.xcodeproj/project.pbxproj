@@ -7,15 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		23C725812292F382009E5AE8 /* XDXCameraHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 23C7257F2292F382009E5AE8 /* XDXCameraHandler.m */; };
+		23C725822292F382009E5AE8 /* XDXCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 23C725802292F382009E5AE8 /* XDXCameraModel.m */; };
 		48B417552289280E00BCF53D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48B417542289280E00BCF53D /* AppDelegate.m */; };
 		48B417582289280E00BCF53D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48B417572289280E00BCF53D /* ViewController.m */; };
 		48B4175B2289280E00BCF53D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48B417592289280E00BCF53D /* Main.storyboard */; };
 		48B4175D2289280F00BCF53D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48B4175C2289280F00BCF53D /* Assets.xcassets */; };
 		48B417602289280F00BCF53D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48B4175E2289280F00BCF53D /* LaunchScreen.storyboard */; };
 		48B417632289280F00BCF53D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 48B417622289280F00BCF53D /* main.m */; };
+		48B4176C2289291100BCF53D /* XDXVideoEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 48B4176B2289291100BCF53D /* XDXVideoEncoder.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		23C7257D2292F382009E5AE8 /* XDXCameraModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XDXCameraModel.h; sourceTree = "<group>"; };
+		23C7257E2292F382009E5AE8 /* XDXCameraHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XDXCameraHandler.h; sourceTree = "<group>"; };
+		23C7257F2292F382009E5AE8 /* XDXCameraHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XDXCameraHandler.m; sourceTree = "<group>"; };
+		23C725802292F382009E5AE8 /* XDXCameraModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XDXCameraModel.m; sourceTree = "<group>"; };
+		48A95BAA228D1AD000224DE2 /* log4cplus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = log4cplus.h; sourceTree = "<group>"; };
 		48B417502289280E00BCF53D /* XDXVideoEncoder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XDXVideoEncoder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		48B417532289280E00BCF53D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48B417542289280E00BCF53D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -26,6 +34,8 @@
 		48B4175F2289280F00BCF53D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		48B417612289280F00BCF53D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		48B417622289280F00BCF53D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		48B4176A2289291100BCF53D /* XDXVideoEncoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XDXVideoEncoder.h; sourceTree = "<group>"; };
+		48B4176B2289291100BCF53D /* XDXVideoEncoder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XDXVideoEncoder.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +49,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		23C7257C2292F36F009E5AE8 /* Camera Module */ = {
+			isa = PBXGroup;
+			children = (
+				23C7257E2292F382009E5AE8 /* XDXCameraHandler.h */,
+				23C7257F2292F382009E5AE8 /* XDXCameraHandler.m */,
+				23C7257D2292F382009E5AE8 /* XDXCameraModel.h */,
+				23C725802292F382009E5AE8 /* XDXCameraModel.m */,
+			);
+			path = "Camera Module";
+			sourceTree = "<group>";
+		};
+		48A95BA9228D1AC800224DE2 /* 3rd */ = {
+			isa = PBXGroup;
+			children = (
+				48A95BAA228D1AD000224DE2 /* log4cplus.h */,
+			);
+			path = 3rd;
+			sourceTree = "<group>";
+		};
 		48B417472289280E00BCF53D = {
 			isa = PBXGroup;
 			children = (
@@ -58,6 +87,9 @@
 		48B417522289280E00BCF53D /* XDXVideoEncoder */ = {
 			isa = PBXGroup;
 			children = (
+				23C7257C2292F36F009E5AE8 /* Camera Module */,
+				48A95BA9228D1AC800224DE2 /* 3rd */,
+				48B41769228928E200BCF53D /* Video Encoder */,
 				48B417532289280E00BCF53D /* AppDelegate.h */,
 				48B417542289280E00BCF53D /* AppDelegate.m */,
 				48B417562289280E00BCF53D /* ViewController.h */,
@@ -69,6 +101,15 @@
 				48B417622289280F00BCF53D /* main.m */,
 			);
 			path = XDXVideoEncoder;
+			sourceTree = "<group>";
+		};
+		48B41769228928E200BCF53D /* Video Encoder */ = {
+			isa = PBXGroup;
+			children = (
+				48B4176A2289291100BCF53D /* XDXVideoEncoder.h */,
+				48B4176B2289291100BCF53D /* XDXVideoEncoder.m */,
+			);
+			path = "Video Encoder";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -144,6 +185,9 @@
 				48B417582289280E00BCF53D /* ViewController.m in Sources */,
 				48B417632289280F00BCF53D /* main.m in Sources */,
 				48B417552289280E00BCF53D /* AppDelegate.m in Sources */,
+				23C725822292F382009E5AE8 /* XDXCameraModel.m in Sources */,
+				23C725812292F382009E5AE8 /* XDXCameraHandler.m in Sources */,
+				48B4176C2289291100BCF53D /* XDXVideoEncoder.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -220,7 +264,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -273,7 +317,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
