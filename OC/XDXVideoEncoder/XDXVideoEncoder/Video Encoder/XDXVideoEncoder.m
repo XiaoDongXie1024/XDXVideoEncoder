@@ -28,7 +28,7 @@ static const uint8_t kStartCode[]     = {0x00, 0x00, 0x00, 0x01};
 @property (assign, nonatomic) int  bitrate;
 @property (assign, nonatomic) int  errorCount;
 
-@property (assign, nonatomic) BOOL                   finishNALUHeaderState;
+@property (assign, nonatomic) BOOL                   needResetKeyParamSetBuffer;
 @property (assign, nonatomic) XDXVideoEncoderType    encoderType;
 @property (strong, nonatomic) NSLock                 *lock;
 @property (strong, nonatomic) NSMutableArray         *averageBitratesArray;
@@ -88,18 +88,18 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
     }
     
     if(isKeyFrame) {
-        static uint8_t *nalHeaderBuffer  = NULL;
-        static size_t  naluHeadSize      = 0;
+        static uint8_t *keyParameterSetBuffer    = NULL;
+        static size_t  keyParameterSetBufferSize = 0;
         
         // Note: the NALU header will not change if video resolution not change.
-        if (NO == encoder.finishNALUHeaderState) {
+        if (keyParameterSetBufferSize == 0 || YES == encoder.needResetKeyParamSetBuffer) {
             const uint8_t  *vps, *sps, *pps;
             size_t         vpsSize, spsSize, ppsSize;
             int            NALUnitHeaderLengthOut;
             size_t         parmCount;
             
-            if (nalHeaderBuffer != NULL) {
-                free(nalHeaderBuffer);
+            if (keyParameterSetBuffer != NULL) {
+                free(keyParameterSetBuffer);
             }
             
             CMFormatDescriptionRef format = CMSampleBufferGetFormatDescription(sampleBuffer);
@@ -107,12 +107,12 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
                 CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 0, &sps, &spsSize, &parmCount, &NALUnitHeaderLengthOut);
                 CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 1, &pps, &ppsSize, &parmCount, &NALUnitHeaderLengthOut);
                 
-                naluHeadSize = spsSize+4+ppsSize+4;
-                nalHeaderBuffer = (uint8_t*)malloc(naluHeadSize);
-                memcpy(nalHeaderBuffer, "\x00\x00\x00\x01", 4);
-                memcpy(&nalHeaderBuffer[4], sps, spsSize);
-                memcpy(&nalHeaderBuffer[4+spsSize], "\x00\x00\x00\x01", 4);
-                memcpy(&nalHeaderBuffer[4+spsSize+4], pps, ppsSize);
+                keyParameterSetBufferSize = spsSize+4+ppsSize+4;
+                keyParameterSetBuffer = (uint8_t*)malloc(keyParameterSetBufferSize);
+                memcpy(keyParameterSetBuffer, "\x00\x00\x00\x01", 4);
+                memcpy(&keyParameterSetBuffer[4], sps, spsSize);
+                memcpy(&keyParameterSetBuffer[4+spsSize], "\x00\x00\x00\x01", 4);
+                memcpy(&keyParameterSetBuffer[4+spsSize+4], pps, ppsSize);
                 
                 log4cplus_info("Video Encoder:", "H264 find IDR frame， spsSize : %zu, ppsSize : %zu",spsSize, ppsSize);
             }else if (encoder.encoderType == XDXH265Encoder) {
@@ -120,18 +120,18 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
                 CMVideoFormatDescriptionGetHEVCParameterSetAtIndex(format, 1, &sps, &spsSize, &parmCount, &NALUnitHeaderLengthOut);
                 CMVideoFormatDescriptionGetHEVCParameterSetAtIndex(format, 2, &pps, &ppsSize, &parmCount, &NALUnitHeaderLengthOut);
                 
-                naluHeadSize = vpsSize+4+spsSize+4+ppsSize+4;
-                nalHeaderBuffer = (uint8_t*)malloc(naluHeadSize);
-                memcpy(nalHeaderBuffer, "\x00\x00\x00\x01", 4);
-                memcpy(&nalHeaderBuffer[4], vps, vpsSize);
-                memcpy(&nalHeaderBuffer[4+vpsSize], "\x00\x00\x00\x01", 4);
-                memcpy(&nalHeaderBuffer[4+vpsSize+4], sps, spsSize);
-                memcpy(&nalHeaderBuffer[4+vpsSize+4+spsSize], "\x00\x00\x00\x01", 4);
-                memcpy(&nalHeaderBuffer[4+vpsSize+4+spsSize+4], pps, ppsSize);
+                keyParameterSetBufferSize = vpsSize+4+spsSize+4+ppsSize+4;
+                keyParameterSetBuffer = (uint8_t*)malloc(keyParameterSetBufferSize);
+                memcpy(keyParameterSetBuffer, "\x00\x00\x00\x01", 4);
+                memcpy(&keyParameterSetBuffer[4], vps, vpsSize);
+                memcpy(&keyParameterSetBuffer[4+vpsSize], "\x00\x00\x00\x01", 4);
+                memcpy(&keyParameterSetBuffer[4+vpsSize+4], sps, spsSize);
+                memcpy(&keyParameterSetBuffer[4+vpsSize+4+spsSize], "\x00\x00\x00\x01", 4);
+                memcpy(&keyParameterSetBuffer[4+vpsSize+4+spsSize+4], pps, ppsSize);
                 log4cplus_info("Video Encoder:", "H265 find IDR frame, vpsSize : %zu, spsSize : %zu, ppsSize : %zu",vpsSize,spsSize, ppsSize);
             }
             
-            encoder.finishNALUHeaderState = YES;
+            encoder.needResetKeyParamSetBuffer = NO;
         }
         
         if (encoder.isNeedRecord) {
@@ -140,7 +140,7 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
                 log4cplus_info("Video Encoder:", "Start video record.");
             }
             
-            fwrite(nalHeaderBuffer, 1, naluHeadSize, encoder->mVideoFile);
+            fwrite(keyParameterSetBuffer, 1, keyParameterSetBufferSize, encoder->mVideoFile);
         }
         
         log4cplus_info("Video Encoder:", "Load a I frame.");
@@ -189,6 +189,7 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
         _encoderType          = encoderType;
         _lock                 = [[NSLock alloc] init];
         _isSupportRealTimeEncode = isSupportRealTimeEncode;
+        _needResetKeyParamSetBuffer = YES;
         if (encoderType == XDXH265Encoder) {
             if (@available(iOS 11.0, *)) {
                 if ([[AVAssetExportSession allExportPresets] containsObject:AVAssetExportPresetHEVCHighestQuality]) {
@@ -222,7 +223,7 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
                                               height:self.height
                                                  fps:self.fps
                                              bitrate:self.bitrate
-                             isSupportRealtimeEncode:NO
+                             isSupportRealtimeEncode:self.isSupportRealTimeEncode
                                       iFrameDuration:30
                                                 lock:self.lock];
 }
@@ -604,7 +605,12 @@ void printfBuffer(uint8_t* buf, int size, char* name) {
     NSString *dateStr = [dateFormatter stringFromDate:[NSDate date]];
     
     NSString *path               = (NSString *)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *savePath           = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.mov",dateStr]];
+    NSString *savePath;
+    if (self.encoderType == XDXH264Encoder) {
+        savePath = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.h264",dateStr]];
+    }else if (self.encoderType == XDXH265Encoder) {
+        savePath = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.h265",dateStr]];
+    }
     
     NSLog(@"File path:%@",savePath);
     

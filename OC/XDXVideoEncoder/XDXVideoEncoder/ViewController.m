@@ -11,6 +11,16 @@
 #import "XDXCameraHandler.h"
 #import "XDXVideoEncoder.h"
 
+
+/*
+ 
+ 关于本Demo中所有不理解的代码可以通过以下文章进行学习,学习后再使用效果更佳
+ 
+ (推荐阅读)H264, H265硬件编解码基础及码流分析: https://juejin.im/post/5ce9f36bf265da1bbd4b5084
+ Github: https://github.com/XiaoDongXie1024/XDXVideoEncoder
+ 
+ */
+
 @interface ViewController ()<XDXCameraHandlerDelegate>
 
 @property (nonatomic, strong) XDXCameraHandler              *cameraHandler;
