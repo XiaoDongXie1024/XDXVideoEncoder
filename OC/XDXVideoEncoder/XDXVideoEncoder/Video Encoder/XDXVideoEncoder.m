@@ -284,6 +284,9 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
     OSStatus status = VTCompressionSessionPrepareToEncodeFrames(session);
     [lock unlock];
     if(status != noErr) {
+        if (session) {
+            [self tearDownSessionWithSession:session lock:lock];
+        }
         log4cplus_error("Video Encoder:", "create encoder failed, status: %d",(int)status);
         return NULL;
     }else {
@@ -573,6 +576,7 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
     
     if (session == NULL) {
         log4cplus_error("Video Encoder:", "%s current compression is NULL",__func__);
+        [lock unlock];
         return;
     }else {
         VTCompressionSessionCompleteFrames(session, kCMTimeInvalid);
