@@ -15,7 +15,25 @@ typedef enum : NSUInteger {
     XDXH265Encoder = 265,
 } XDXVideoEncoderType;
 
+struct XDXVideEncoderData {
+    BOOL     isKeyFrame;
+    uint8_t  *data;
+    size_t   size;
+};
+
+typedef struct XDXVideEncoderData* XDXVideEncoderDataRef;
+
+@protocol XDXVideoEncoderDelegate <NSObject>
+
+@optional
+- (void)receiveVideoEncoderData:(XDXVideEncoderDataRef)dataRef;
+
+@end
+
 @interface XDXVideoEncoder : NSObject
+
+@property (assign, nonatomic) XDXVideoEncoderType       encoderType;
+@property (nonatomic, weak) id<XDXVideoEncoderDelegate> delegate;
 
 /**
  Init
@@ -53,12 +71,6 @@ typedef enum : NSUInteger {
  Force insert I frame
  */
 - (void)forceInsertKeyFrame;
-
-/**
- * Start / Stop record file.
- */
-- (void)startVideoRecord;
-- (void)stopVideoRecord;
 
 @end
 

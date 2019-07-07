@@ -29,18 +29,14 @@ static const uint8_t kStartCode[]     = {0x00, 0x00, 0x00, 0x01};
 @property (assign, nonatomic) int  errorCount;
 
 @property (assign, nonatomic) BOOL                   needResetKeyParamSetBuffer;
-@property (assign, nonatomic) XDXVideoEncoderType    encoderType;
 @property (strong, nonatomic) NSLock                 *lock;
 @property (strong, nonatomic) NSMutableArray         *averageBitratesArray;
-
-@property (nonatomic, assign) BOOL isNeedRecord;
 
 @end
 
 @implementation XDXVideoEncoder
 {
     VTCompressionSessionRef     mSession;
-    FILE                        *mVideoFile;
 }
 
 static XDXVideoEncoder *m_encoder = NULL;
@@ -134,13 +130,14 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
             encoder.needResetKeyParamSetBuffer = NO;
         }
         
-        if (encoder.isNeedRecord) {
-            if (encoder->mVideoFile == NULL) {
-                [encoder initSaveVideoFile];
-                log4cplus_info("Video Encoder:", "Start video record.");
-            }
-            
-            fwrite(keyParameterSetBuffer, 1, keyParameterSetBufferSize, encoder->mVideoFile);
+        struct XDXVideEncoderData encoderData = {
+            .isKeyFrame = YES,
+            .data       = keyParameterSetBuffer,
+            .size       = keyParameterSetBufferSize,
+        };
+        
+        if ([encoder.delegate respondsToSelector:@selector(receiveVideoEncoderData:)]) {
+            [encoder.delegate receiveVideoEncoderData:&encoderData];
         }
         
         log4cplus_info("Video Encoder:", "Load a I frame.");
@@ -160,14 +157,14 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
         bufferOffset += kStartCodeLength + NALUnitLength;
     }
     
-    if (encoder.isNeedRecord && encoder->mVideoFile != NULL) {
-        fwrite(bufferDataPointer, 1, blockBufferLength, encoder->mVideoFile);
-    }else {
-        if (encoder->mVideoFile != NULL) {
-            fclose(encoder->mVideoFile);
-            encoder->mVideoFile = NULL;
-            log4cplus_info("Video Encoder:", "Stop video record.");
-        }
+    struct XDXVideEncoderData encoderData = {
+        .isKeyFrame = NO,
+        .data       = bufferDataPointer,
+        .size       = blockBufferLength,
+    };
+    
+    if ([encoder.delegate respondsToSelector:@selector(receiveVideoEncoderData:)]) {
+        [encoder.delegate receiveVideoEncoderData:&encoderData];
     }
     
 //    log4cplus_debug("Video Encoder:","H265 encoded video:%lld, size:%lu, interval:%lld", dtsAfter,blockBufferLength, dtsAfter - last_dts);
@@ -179,7 +176,6 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
 -(instancetype)initWithWidth:(int)width height:(int)height fps:(int)fps bitrate:(int)bitrate isSupportRealTimeEncode:(BOOL)isSupportRealTimeEncode encoderType:(XDXVideoEncoderType)encoderType {
     if (self = [super init]) {
         mSession              = NULL;
-        mVideoFile            = NULL;
         _width                = width;
         _height               = height;
         _fps                  = fps;
@@ -248,16 +244,6 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
 
 - (void)forceInsertKeyFrame {
     self.needForceInsertKeyFrame = YES;
-}
-
-#pragma mark Record File
-- (void)startVideoRecord {
-    self.isNeedRecord = YES;
-    [self forceInsertKeyFrame];
-}
-
-- (void)stopVideoRecord {
-    self.isNeedRecord = NO;
 }
 
 #pragma mark - Private
@@ -600,27 +586,6 @@ void printfBuffer(uint8_t* buf, int size, char* name) {
         printf("%02x,", buf[i]);
     }
     printf("\n");
-}
-
-- (void)initSaveVideoFile{
-    // write file
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yyyy_MM_dd__HH_mm_ss";
-    NSString *dateStr = [dateFormatter stringFromDate:[NSDate date]];
-    
-    NSString *path               = (NSString *)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *savePath;
-    if (self.encoderType == XDXH264Encoder) {
-        savePath = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.h264",dateStr]];
-    }else if (self.encoderType == XDXH265Encoder) {
-        savePath = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.h265",dateStr]];
-    }
-    
-    NSLog(@"File path:%@",savePath);
-    
-    if( (mVideoFile = fopen([savePath UTF8String], "w+")) == NULL ){
-        perror("Video Encoder: File error");
-    }
 }
 
 @end

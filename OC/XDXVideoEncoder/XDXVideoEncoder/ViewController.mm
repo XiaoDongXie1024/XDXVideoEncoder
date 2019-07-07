@@ -10,7 +10,7 @@
 #import "XDXCameraModel.h"
 #import "XDXCameraHandler.h"
 #import "XDXVideoEncoder.h"
-
+#include "log4cplus.h"
 
 /*
  
@@ -21,11 +21,15 @@
  
  */
 
-@interface ViewController ()<XDXCameraHandlerDelegate>
-
-@property (nonatomic, strong) XDXCameraHandler              *cameraHandler;
+@interface ViewController ()<XDXCameraHandlerDelegate, XDXVideoEncoderDelegate>
+{
+        FILE *mVideoFile;
+}
+@property (nonatomic, strong) XDXCameraHandler *cameraHandler;
 
 @property (nonatomic, strong) XDXVideoEncoder *videoEncoder;
+
+@property (nonatomic, assign) BOOL isNeedRecord;
 
 @end
 
@@ -36,6 +40,7 @@
     
     [self configurevideoEncoder];
     [self configureCamera];
+    
 }
 
 #pragma mark - Init
@@ -78,18 +83,19 @@
                                                        bitrate:2048
                                        isSupportRealTimeEncode:NO
                                                    encoderType:XDXH265Encoder]; // XDXH264Encoder
-    
+    self.videoEncoder.delegate = self;
     [self.videoEncoder configureEncoderWithWidth:1280 height:720];
 }
 
 #pragma mark - Button Action
 
 - (IBAction)startRecord:(id)sender {
-    [self.videoEncoder startVideoRecord];
+    [self.videoEncoder forceInsertKeyFrame];
+    self.isNeedRecord = YES;
 }
 
 - (IBAction)stopRecord:(id)sender {
-    [self.videoEncoder stopVideoRecord];
+    self.isNeedRecord = NO;
 }
 
 
@@ -110,6 +116,30 @@
     
 }
 
+#pragma mark - Decoder Delegate
+- (void)receiveVideoEncoderData:(XDXVideEncoderDataRef)dataRef {
+    if (dataRef->isKeyFrame) {
+        if (self.isNeedRecord) {
+            if (mVideoFile == NULL) {
+                [self initSaveVideoFile];
+                log4cplus_info("Video Encoder:", "Start video record.");
+            }
+            
+            fwrite(dataRef->data, 1, dataRef->size, mVideoFile);
+        }
+    }else {
+        if (self.isNeedRecord && mVideoFile != NULL) {
+            fwrite(dataRef->data, 1, dataRef->size, mVideoFile);
+        }else {
+            if (mVideoFile != NULL) {
+                fclose(mVideoFile);
+                mVideoFile = NULL;
+                log4cplus_info("Video Encoder:", "Stop video record.");
+            }
+        }
+    }
+}
+
 #pragma mark - Notification
 - (void)deviceOrientationDidChange:(NSNotification *)notification {
     //Obtaining the current device orientation
@@ -122,6 +152,27 @@
         [self.cameraHandler adjustVideoOrientationByScreenOrientation:orientation];
     }else {
         NSLog(@"App not support");
+    }
+}
+
+- (void)initSaveVideoFile{
+    // write file
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = @"yyyy_MM_dd__HH_mm_ss";
+    NSString *dateStr = [dateFormatter stringFromDate:[NSDate date]];
+    
+    NSString *path               = (NSString *)[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *savePath;
+    if (self.videoEncoder.encoderType == XDXH264Encoder) {
+        savePath = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.h264",dateStr]];
+    }else if (self.videoEncoder.encoderType == XDXH265Encoder) {
+        savePath = [path stringByAppendingString:[NSString stringWithFormat:@"/%@.h265",dateStr]];
+    }
+    
+    NSLog(@"File path:%@",savePath);
+    
+    if( (mVideoFile = fopen([savePath UTF8String], "w+")) == NULL ){
+        perror("Video Encoder: File error");
     }
 }
 

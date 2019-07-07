@@ -10,7 +10,7 @@
 		23C725812292F382009E5AE8 /* XDXCameraHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 23C7257F2292F382009E5AE8 /* XDXCameraHandler.m */; };
 		23C725822292F382009E5AE8 /* XDXCameraModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 23C725802292F382009E5AE8 /* XDXCameraModel.m */; };
 		48B417552289280E00BCF53D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 48B417542289280E00BCF53D /* AppDelegate.m */; };
-		48B417582289280E00BCF53D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 48B417572289280E00BCF53D /* ViewController.m */; };
+		48B417582289280E00BCF53D /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 48B417572289280E00BCF53D /* ViewController.mm */; };
 		48B4175B2289280E00BCF53D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48B417592289280E00BCF53D /* Main.storyboard */; };
 		48B4175D2289280F00BCF53D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48B4175C2289280F00BCF53D /* Assets.xcassets */; };
 		48B417602289280F00BCF53D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 48B4175E2289280F00BCF53D /* LaunchScreen.storyboard */; };
@@ -28,7 +28,7 @@
 		48B417532289280E00BCF53D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		48B417542289280E00BCF53D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		48B417562289280E00BCF53D /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		48B417572289280E00BCF53D /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		48B417572289280E00BCF53D /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		48B4175A2289280E00BCF53D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		48B4175C2289280F00BCF53D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		48B4175F2289280F00BCF53D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -93,7 +93,7 @@
 				48B417532289280E00BCF53D /* AppDelegate.h */,
 				48B417542289280E00BCF53D /* AppDelegate.m */,
 				48B417562289280E00BCF53D /* ViewController.h */,
-				48B417572289280E00BCF53D /* ViewController.m */,
+				48B417572289280E00BCF53D /* ViewController.mm */,
 				48B417592289280E00BCF53D /* Main.storyboard */,
 				48B4175C2289280F00BCF53D /* Assets.xcassets */,
 				48B4175E2289280F00BCF53D /* LaunchScreen.storyboard */,
@@ -182,7 +182,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				48B417582289280E00BCF53D /* ViewController.m in Sources */,
+				48B417582289280E00BCF53D /* ViewController.mm in Sources */,
 				48B417632289280F00BCF53D /* main.m in Sources */,
 				48B417552289280E00BCF53D /* AppDelegate.m in Sources */,
 				23C725822292F382009E5AE8 /* XDXCameraModel.m in Sources */,
