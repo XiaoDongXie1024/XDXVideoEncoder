@@ -340,7 +340,7 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
     
     if(bitrate) {
         if([self isSupportPropertyWithSession:session key:kVTCompressionPropertyKey_AverageBitRate]) {
-            int value = bitrate << 10;
+            int value = bitrate;
             CFNumberRef ref = CFNumberCreate(NULL, kCFNumberSInt32Type, &value);
             [self setSessionPropertyWithSession:session key:kVTCompressionPropertyKey_AverageBitRate value:ref];
             CFRelease(ref);
