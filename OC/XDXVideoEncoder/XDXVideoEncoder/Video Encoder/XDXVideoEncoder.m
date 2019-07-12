@@ -131,9 +131,11 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
         }
         
         struct XDXVideEncoderData encoderData = {
-            .isKeyFrame = YES,
-            .data       = keyParameterSetBuffer,
-            .size       = keyParameterSetBufferSize,
+            .isKeyFrame  = NO,
+            .isExtraData = YES,
+            .data        = keyParameterSetBuffer,
+            .size        = keyParameterSetBufferSize,
+            .timestamp   = dtsAfter,
         };
         
         if ([encoder.delegate respondsToSelector:@selector(receiveVideoEncoderData:)]) {
@@ -158,9 +160,11 @@ static void EncodeCallBack(void *outputCallbackRefCon,void *souceFrameRefCon,OSS
     }
     
     struct XDXVideEncoderData encoderData = {
-        .isKeyFrame = NO,
-        .data       = bufferDataPointer,
-        .size       = blockBufferLength,
+        .isKeyFrame  = isKeyFrame,
+        .isExtraData = NO,
+        .data        = bufferDataPointer,
+        .size        = blockBufferLength,
+        .timestamp   = dtsAfter,
     };
     
     if ([encoder.delegate respondsToSelector:@selector(receiveVideoEncoderData:)]) {
